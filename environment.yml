@@ -12,4 +12,4 @@ dependencies:
   - pip:
     - zarr
     - datetime
-    - pyasdf
+    - pyasdf 
