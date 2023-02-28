@@ -13,3 +13,5 @@ dependencies:
     - zarr
     - datetime
     - pyasdf
+    - s3fs
+    - fsspec

@@ -69,8 +69,8 @@ cha_list = np.array(range(500, 1100))
 nsta = len(cha_list)
 
 # worker info
-N_NODE = 1
-I_NODE = 0
+ARRAY_SIZE = int(os.environ['AWS_BATCH_JOB_ARRAY_SIZE'])
+ARRAY_INDEX = int(os.environ['AWS_BATCH_JOB_ARRAY_INDEX'])
 
 # client information
 bucket = "seadas-december-2022"
@@ -99,7 +99,7 @@ else:
 
 # split jobs by rank
 date_list   = comm.bcast(date_list,root=0)
-node_split = np.array_split(date_list, N_NODE)[I_NODE] 
+array_split = np.array_split(date_list, ARRAY_SIZE)[ARRAY_INDEX] 
 im = np.arange(1440)
 rank_split = np.array_split(im, size)[rank]                                         
 
@@ -143,16 +143,16 @@ if rank == 0:
         raise ValueError('Require %5.3fG memory but only %5.3fG provided)! Reduce inc_hours to avoid this issue!' % (memory_size,MAX_MEM))
 
 # MPI: loop through each time-chunk
-for i in node_split:
-    # one node
-    node_t0 = datetime(year = i.year, month = i.month, day = i.day, 
+for i in array_split:
+    # one job
+    job_t0 = datetime(year = i.year, month = i.month, day = i.day, 
                        hour = 0, minute = 0, second = 0, microsecond=0)
     
     for ii in rank_split:
         t0=time.time()
 
-        starttime = node_t0 + timedelta(minutes = int(ii))
-        endtime   = node_t0 + timedelta(minutes = int(ii+1))
+        starttime = job_t0 + timedelta(minutes = int(ii))
+        endtime   = job_t0 + timedelta(minutes = int(ii+1))
         tdata = client.get_data(cha_list, starttime, endtime).T
         print(starttime)
 
