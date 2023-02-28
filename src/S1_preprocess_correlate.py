@@ -81,7 +81,7 @@ cha_list = np.array(range(500, 1100))
 nsta = len(cha_list)
 
 # worker info
-ARRAY_SIZE = int(os.environ['AWS_BATCH_JOB_ARRAY_SIZE'])
+ARRAY_SIZE = int(os.environ['JOB_ARRAY_SIZE'])
 ARRAY_INDEX = int(os.environ['AWS_BATCH_JOB_ARRAY_INDEX'])
 # ARRAY_SIZE = 1
 # ARRAY_INDEX = 0
