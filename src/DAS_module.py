@@ -1,6 +1,6 @@
 import os
 import glob
-import h5py
+# import h5py
 import scipy
 import numpy as np
 from numba import jit
@@ -13,32 +13,32 @@ from obspy.core.util.base import _get_function_from_entry_point
 ############## CORE FUNCTIONS ######################
 ####################################################
 
-def update_das_para(para):
-    '''
-    update DAS parameters by loading some sample data
+# def update_das_para(para):
+#     '''
+#     update DAS parameters by loading some sample data
 
-    PARAMETERS:
-    -----------------------
-    para: dict containing all important parameters 
-    '''
-    # having this file saves a tons of time: see L95-126 for why  
-    allfiles_path = os.path.join(para['DATADIR'],'*.'+para['input_fmt'])                    # make sure all sac/mseed files can be found through this format
+#     PARAMETERS:
+#     -----------------------
+#     para: dict containing all important parameters 
+#     '''
+#     # having this file saves a tons of time: see L95-126 for why  
+#     allfiles_path = os.path.join(para['DATADIR'],'*.'+para['input_fmt'])                    # make sure all sac/mseed files can be found through this format
 
-    # load one sample file to get some basic parameters
-    allfiles = glob.glob(allfiles_path)
-    with h5py.File(allfiles[0],'r') as f:
-        tdata = f['DAS'][:]
-        npts_chunk,nsta = tdata.shape
-        cha_list = []
-        for ii in range(nsta):
-            cha_list.append('C'+format(ii,'04d'))   
-        cha_list = np.array(cha_list)  
+#     # load one sample file to get some basic parameters
+#     allfiles = glob.glob(allfiles_path)
+#     with h5py.File(allfiles[0],'r') as f:
+#         tdata = f['DAS'][:]
+#         npts_chunk,nsta = tdata.shape
+#         cha_list = []
+#         for ii in range(nsta):
+#             cha_list.append('C'+format(ii,'04d'))   
+#         cha_list = np.array(cha_list)  
 
-    para.update({'npts_chunk':npts_chunk,
-                 'nsta':nsta,
-                 'cha_list':cha_list,
-                })    
-    return para
+#     para.update({'npts_chunk':npts_chunk,
+#                  'nsta':nsta,
+#                  'cha_list':cha_list,
+#                 })    
+#     return para
 
 def preprocess_raw_make_stat(tdata,prepro_para):
     '''
