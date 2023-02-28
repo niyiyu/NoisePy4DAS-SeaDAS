@@ -192,8 +192,8 @@ for ii in rank_split:
             print('it takes %6.2fs before getting into the cross correlation'%(t2-t1))
 
         with tiledb.open(f"s3://{ccf_bucket}/", 'w', ctx = ctx) as A:
-            # for iiS in range(len(sta)-1):
-            for iiS in range(1):
+            for iiS in range(len(sta)-1):
+            # for iiS in range(1):
                 if flag:
                     print('working on source %s'%sta[iiS])
 
