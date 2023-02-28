@@ -15,4 +15,3 @@ dependencies:
     - datetime
     - s3fs
     - fsspec
-    - h5py
