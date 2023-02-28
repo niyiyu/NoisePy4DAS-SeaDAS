@@ -1,0 +1,8 @@
+zarr
+xarray
+tiledb
+dask
+s3fs
+distributed
+scipy
+psutil

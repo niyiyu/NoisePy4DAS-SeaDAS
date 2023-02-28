@@ -74,7 +74,9 @@ I_NODE = 0
 
 # client information
 bucket = "seadas-december-2022"
-endpoint = "pnwstore1.ess.washington.edu:9000"
+endpoint = "s3.us-west-2.amazonaws.com"
+secure = True
+role_assigned = True
 
 #---------MPI-----------
 comm = MPI.COMM_WORLD
@@ -86,7 +88,7 @@ size = comm.Get_size()
 # size = 1
 
 # prepare client and time range
-client = Client(bucket, endpoint)
+client = Client(bucket, endpoint, secure = secure, role_assigned = role_assigned)
 if rank == 0:
     t0 = datetime.fromisoformat(client.meta['acquisition.acquisition_start_time']).date()
     t1 = datetime.fromisoformat(client.meta['acquisition.acquisition_end_time']).date()
