@@ -11,7 +11,7 @@ dependencies:
   - pycwt
   - pip:
     - zarr
+    - tiledb
     - datetime
-    - pyasdf
     - s3fs
     - fsspec
