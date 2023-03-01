@@ -37,16 +37,17 @@ tt0=time.time()
 
 # pnwstore1_endpoint = "pnwstore1.ess.washington.edu:9000"
 
+ccf_bucket = "seadas-december-2022-ccf"
+bucket = "seadas-december-2022"
+endpoint = "s3.us-west-2.amazonaws.com"
+
 config = tiledb.Config()
 config["vfs.s3.scheme"] = "https"
 config["vfs.s3.region"] = "us-west-2"
 config["vfs.s3.endpoint_override"] = ""
 config["vfs.s3.use_virtual_addressing"] = "true"
 ctx = tiledb.Ctx(config)
-ccf_bucket = "seadas-december-2022-ccf"
 
-bucket = "seadas-december-2022"
-endpoint = "s3.us-west-2.amazonaws.com"
 secure = True
 role_assigned = True
 
@@ -215,8 +216,6 @@ for i in rank_split:
                 # stacking one minute
                 corr_full[:, iS + receiver_lst - sta[iiS] - 1] += corr.T
                 stack_full[:, iS + receiver_lst - sta[iiS] - 1] += 1
-                if flag:
-                    print(f"{min(iS + receiver_lst - sta[iiS] - 1), max(iS + receiver_lst - sta[iiS] - 1)}")
 
         t3=time.time()
         print('it takes '+str(t3-t2)+' s to cross correlate one chunk of data')
