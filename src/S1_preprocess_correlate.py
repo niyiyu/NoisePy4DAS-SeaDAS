@@ -1,5 +1,6 @@
 import sys
 sys.path.append("/tmp/DASStore")
+# sys.path.append("/home/niyiyu/notebooks/DASStore")
 
 import os
 import time
@@ -100,20 +101,20 @@ client = Client(bucket, endpoint, secure = secure, role_assigned = role_assigned
 if rank == 0:
     acq_t0 = datetime.fromisoformat(client.meta['acquisition.acquisition_start_time'])
     acq_t1 = datetime.fromisoformat(client.meta['acquisition.acquisition_end_time'])
-    n_minute = ((acq_t1 - acq_t0).days + 1) * 1440
+    n_hour = ((acq_t1 - acq_t0).days + 1) * 24
     # n_days = (t1 - t0 + timedelta(days=1)).days
     # minute_list = [t0 + timedelta(days = i) for i in range(n_days)]
 else:
     # date_list = []
     acq_t0 = 0
-    n_minute = 0
+    n_hour = 0
 
 # split jobs by rank
 # date_list   = comm.bcast(date_list,root=0)
-n_minute = comm.bcast(n_minute,root=0)
+n_hour = comm.bcast(n_hour,root=0)
 acq_t0 = datetime.fromtimestamp(comm.bcast(acq_t0.timestamp(),root=0))
-array_split = np.array_split(np.arange(n_minute), ARRAY_SIZE)[ARRAY_INDEX] 
-rank_split = np.array_split(array_split, size)[rank]                                         
+array_split = np.array_split(np.arange(n_hour), ARRAY_SIZE)[ARRAY_INDEX] 
+rank_split = np.array_split(array_split, size)[rank]
 
 ##################################################
 # assemble parameters for data pre-processing
@@ -151,49 +152,53 @@ if rank == 0:
         raise ValueError('Require %5.3fG memory but only %5.3fG provided)! Reduce inc_hours to avoid this issue!' % (memory_size,MAX_MEM))
 
 # MPI: loop through each time-chunk
-for ii in rank_split:
+for i in rank_split:
     t0=time.time()
 
-    starttime = acq_t0 + timedelta(minutes = int(ii))
-    endtime   = acq_t0 + timedelta(minutes = int(ii+1))
-    tdata = client.get_data(cha_list, starttime, endtime).T
-    print(starttime)
+    corr_full = np.zeros([1001, 179700])
+    stack_full = np.zeros([1, 179700], dtype = int)
+    starthour = acq_t0 + timedelta(hours = int(i))
 
-    # check if data has NaN
-    if not np.isnan(tdata).any():
+    # for each hour
+    for ii in range(60):
+        starttime = starthour + timedelta(minutes = int(ii))
+        endtime   = starthour + timedelta(minutes = int(ii+1))
+        tdata = client.get_data(cha_list, starttime, endtime).T
+        print(starttime)
 
-        # perform pre-processing
-        trace_stdS,dataS = DAS_module.preprocess_raw_make_stat(tdata,prepro_para)
-        t1 = time.time()
-        if flag:
-            print('pre-processing & make stat takes %6.2fs'%(t1-t0))
+        # check if data has NaN
+        if not np.isnan(tdata).any():
 
-        # do normalization if needed
-        white_spect = DAS_module.noise_processing(dataS,prepro_para)
-        Nfft = white_spect.shape[1];Nfft2 = Nfft//2
+            # perform pre-processing
+            trace_stdS,dataS = DAS_module.preprocess_raw_make_stat(tdata,prepro_para)
+            t1 = time.time()
+            if flag:
+                print('pre-processing & make stat takes %6.2fs'%(t1-t0))
 
-        # load fft data in memory for cross-correlations
-        data = white_spect[:,:Nfft2]
-        del dataS,white_spect
-        
-        # remove channel of potential local traffic noise
-        ind = np.where((trace_stdS<prepro_para['max_over_std']) &
-                        (trace_stdS>0) &
-                        (np.isnan(trace_stdS)==0))[0]
-        if not len(ind):
-            raise ValueError('the max_over_std criteria is too high which results in no data')
-        sta = cha_list[ind]
-        white_spect = data[ind]
+            # do normalization if needed
+            white_spect = DAS_module.noise_processing(dataS,prepro_para)
+            Nfft = white_spect.shape[1];Nfft2 = Nfft//2
 
-        # do cross-correlation now
-        temp = starttime.strftime('%Y_%m_%d_%H_%M_%S.%f')[:-4]+'T'+ endtime.strftime('%Y_%m_%d_%H_%M_%S.%f')[:-4]
-        t2 = time.time()
-        if flag:
-            print('it takes %6.2fs before getting into the cross correlation'%(t2-t1))
+            # load fft data in memory for cross-correlations
+            data = white_spect[:,:Nfft2]
+            del dataS,white_spect
+            
+            # remove channel of potential local traffic noise
+            ind = np.where((trace_stdS<prepro_para['max_over_std']) &
+                            (trace_stdS>0) &
+                            (np.isnan(trace_stdS)==0))[0]
+            if not len(ind):
+                raise ValueError('the max_over_std criteria is too high which results in no data')
+            sta = cha_list[ind]
+            white_spect = data[ind]
 
-        with tiledb.open(f"s3://{ccf_bucket}/", 'w', ctx = ctx) as A:
+            # do cross-correlation now
+            temp = starttime.strftime('%Y_%m_%d_%H_%M_%S.%f')[:-4]+'T'+ endtime.strftime('%Y_%m_%d_%H_%M_%S.%f')[:-4]
+            t2 = time.time()
+            if flag:
+                print('it takes %6.2fs before getting into the cross correlation'%(t2-t1))
+
             for iiS in range(len(sta)-1):
-            # for iiS in range(1):
                 if flag:
                     print('working on source %s'%sta[iiS])
 
@@ -203,16 +208,21 @@ for ii in rank_split:
 
                 # update the receiver list
                 tsta = sta[iiS+1:]
-                receiver_lst = sta[tindx]
+                receiver_lst = tsta[tindx]
 
-                corr_full = np.zeros([600, 1001]) * np.nan
-                corr_full[tindx, :] = corr
+                iS = int((599 + 1100-sta[iiS]) * (sta[iiS]-500)/2)
 
-                iiiS = sta[iiS] - 500
-                A[:, iiiS*600:(iiiS+1)*600, ii] = corr_full.T
+                # stacking one minute
+                corr_full[:, iS + receiver_lst - sta[iiS] - 1] += corr.T
+                stack_full[:, iS + receiver_lst - sta[iiS] - 1] += 1
+                if flag:
+                    print(f"{min(iS + receiver_lst - sta[iiS] - 1), max(iS + receiver_lst - sta[iiS] - 1)}")
+
+        t3=time.time()
+        print('it takes '+str(t3-t2)+' s to cross correlate one chunk of data')
     
-    t3=time.time()
-    print('it takes '+str(t3-t2)+' s to cross correlate one chunk of data')
+    with tiledb.open(f"s3://{ccf_bucket}/", 'w', ctx = ctx) as A:
+        A[:, :, i] = corr_full / stack_full
 
 tt1=time.time()
 print('step0B takes '+str(tt1-tt0)+' s')
