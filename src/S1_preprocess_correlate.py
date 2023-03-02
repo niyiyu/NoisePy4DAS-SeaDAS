@@ -57,7 +57,7 @@ sps         = 100                                                         # curr
 samp_freq   = 50                                                          # targeted sampling rate
 freqmin     = 1                                                           # pre filtering frequency bandwidth
 freqmax     = 20                                                          # note this cannot exceed Nquist freq
-flag        = True                                                        # print intermediate variables and computing time
+flag        = False                                                       # print intermediate variables and computing time
 gaug_len    = 2                                                           # gauge length of the array for inter-station distance (assuming linear array)
 
 # useful parameters for cross correlating the data
@@ -81,6 +81,8 @@ MAX_MEM   = 4.0
 # channel list
 cha_list = np.array(range(500, 1100))  
 nsta = len(cha_list)
+# n_pair = int(nsta * (nsta-1)/2)                                       # if only cross-correlate
+n_pair = int((nsta+1)*nsta/2)                                           # if with auto-correlation
 
 # worker info
 ARRAY_SIZE = int(os.environ['JOB_ARRAY_SIZE'])
@@ -156,8 +158,8 @@ if rank == 0:
 for i in rank_split:
     t0=time.time()
 
-    corr_full = np.zeros([1001, 179700])
-    stack_full = np.zeros([1, 179700], dtype = int)
+    corr_full = np.zeros([1001, n_pair])
+    stack_full = np.zeros([1, n_pair], dtype = int)
     starthour = acq_t0 + timedelta(hours = int(i))
 
     # for each hour
@@ -199,19 +201,20 @@ for i in rank_split:
             if flag:
                 print('it takes %6.2fs before getting into the cross correlation'%(t2-t1))
 
-            for iiS in range(len(sta)-1):
+                
+            for iiS in range(len(sta)):             # range(len(sta)) if only cross-correlate
                 if flag:
                     print('working on source %s'%sta[iiS])
 
                 # smooth the source spectrum
                 sfft1 = DAS_module.smooth_source_spect(white_spect[iiS],prepro_para)
-                corr,tindx = DAS_module.correlate(sfft1, white_spect[iiS+1:],prepro_para,Nfft)
+                corr,tindx = DAS_module.correlate(sfft1, white_spect[iiS:],prepro_para,Nfft)
 
                 # update the receiver list
-                tsta = sta[iiS+1:]
+                tsta = sta[iiS:]
                 receiver_lst = tsta[tindx]
 
-                iS = int((599 + 1100-sta[iiS]) * (sta[iiS]-500)/2)
+                iS = int((500 + 1100 - sta[iiS] + 1) * (sta[iiS] - 500)/2)
 
                 # stacking one minute
                 corr_full[:, iS + receiver_lst - sta[iiS] - 1] += corr.T
