@@ -214,7 +214,7 @@ for i in rank_split:
                 tsta = sta[iiS:]
                 receiver_lst = tsta[tindx]
 
-                iS = int((500 + 1100 - sta[iiS] + 1) * (sta[iiS] - 500)/2)
+                iS = int((500 + 1200 - sta[iiS] + 1) * (sta[iiS] - 500)/2)
 
                 # stacking one minute
                 corr_full[:, iS + receiver_lst - sta[iiS] - 1] += corr.T
