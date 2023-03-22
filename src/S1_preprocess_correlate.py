@@ -217,8 +217,8 @@ for i in rank_split:
                 iS = int((500 + 1200 - sta[iiS] + 1) * (sta[iiS] - 500)/2)
 
                 # stacking one minute
-                corr_full[:, iS + receiver_lst - sta[iiS] - 1] += corr.T
-                stack_full[:, iS + receiver_lst - sta[iiS] - 1] += 1
+                corr_full[:, iS + receiver_lst - sta[iiS]] += corr.T
+                stack_full[:, iS + receiver_lst - sta[iiS]] += 1
 
         t3=time.time()
         print('it takes '+str(t3-t2)+' s to cross correlate one chunk of data')
