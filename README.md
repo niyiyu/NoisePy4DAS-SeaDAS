@@ -11,3 +11,9 @@ We host our DAS data in DASstore, a new storage solution for distributed acousti
 
 ## The Tool: NoisePy4DAS
 We use a modified version of [NoisePy](https://github.com/mdenolle/NoisePy) to implement the cross-correlation operation. The package is containerized into Docker image and hosted on GitHub that can is publically available from Cloud platform.
+
+## AWS Batch for massive parallelization computing
+Do remember to set environment variable `JOB_ARRAY_SIZE`.
+```
+["python", "src/S1_preprocess_correlate.py"]
+```

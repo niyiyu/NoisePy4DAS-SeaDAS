@@ -228,13 +228,13 @@ for i in rank_split:
             t2 = time.time()
 
         t3=time.time()
-        print('it takes '+str(t3-t2)+' s to cross correlate one chunk of data')
+        print('it takes '+str(t3-t2)+' s to cross correlate one chunk of data', flush = True)
 
     corr_full /= stack_full
     gc.collect()
     with tiledb.open(f"s3://{ccf_bucket}/", 'w', ctx = ctx) as A:
         for iarr in range(11):
-            A[:, iarr*20000:(iarr+1)*20000, i] = corr_full[:, iarr*20000:(iarr+1)*20000]
+            A[:, iarr*200000:(iarr+1)*200000, i] = corr_full[:, iarr*200000:(iarr+1)*200000]
 
 tt1=time.time()
 print('step0B takes '+str(tt1-tt0)+' s')
