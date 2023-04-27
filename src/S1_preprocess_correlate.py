@@ -1,5 +1,5 @@
 import sys
-sys.path.append("../DASStore")
+sys.path.append("/tmp/DASStore")
 # sys.path.append("/home/niyiyu/notebooks/DASStore")
 
 import os
