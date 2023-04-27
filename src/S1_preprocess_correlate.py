@@ -228,7 +228,7 @@ for i in rank_split:
         print('it takes '+str(t3-t2)+' s to cross correlate one chunk of data')
     
     with tiledb.open(f"s3://{ccf_bucket}/", 'w', ctx = ctx) as A:
-        A[:, :, i] = corr_full / stack_full
+        A[:, :, i] = np.divide(corr_full, stack_full, dtype(np.float16))
 
 tt1=time.time()
 print('step0B takes '+str(tt1-tt0)+' s')
