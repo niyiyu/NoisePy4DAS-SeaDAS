@@ -79,7 +79,7 @@ max_over_std = 10                                                       # threah
 MAX_MEM   = 4.0        
 
 # channel list
-cha_list = np.array(range(500, 1100))  
+cha_list = np.array(range(2089))  
 nsta = len(cha_list)
 # n_pair = int(nsta * (nsta-1)/2)                                       # if only cross-correlate
 n_pair = int((nsta+1)*nsta/2)                                           # if with auto-correlation
@@ -214,7 +214,7 @@ for i in rank_split:
                 tsta = sta[iiS:]
                 receiver_lst = tsta[tindx]
 
-                iS = int((500 + 1200 - sta[iiS] + 1) * (sta[iiS] - 500)/2)
+                iS = int((2089 + 2089 - sta[iiS] + 1) * sta[iiS]/2)
 
                 # stacking one minute
                 corr_full[:, iS + receiver_lst - sta[iiS]] += corr.T
