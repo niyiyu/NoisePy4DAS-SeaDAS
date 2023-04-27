@@ -3,6 +3,7 @@ sys.path.append("/tmp/DASStore")
 # sys.path.append("/home/niyiyu/notebooks/DASStore")
 
 import os
+import gc
 import time
 import numpy as np
 import DAS_module
@@ -163,7 +164,7 @@ for i in rank_split:
     t0=time.time()
 
     corr_full = np.zeros([1001, n_pair], dtype = np.float16)
-    stack_full = np.zeros([1, n_pair], dtype = int)
+    stack_full = np.zeros([1, n_pair], dtype = np.int16)
     starthour = acq_t0 + timedelta(hours = int(i))
 
     # for each hour
@@ -226,9 +227,12 @@ for i in rank_split:
 
         t3=time.time()
         print('it takes '+str(t3-t2)+' s to cross correlate one chunk of data')
-    
+
+    corr_full /= stack_full
+    gc.collect()
     with tiledb.open(f"s3://{ccf_bucket}/", 'w', ctx = ctx) as A:
-        A[:, :, i] = np.divide(corr_full, stack_full, dtype(np.float16))
+        for iarr in range(11):
+            A[:, iarr*20000:(iarr+1)*20000, i] = corr_full[:, iarr*20000:(iarr+1)*20000]
 
 tt1=time.time()
 print('step0B takes '+str(tt1-tt0)+' s')
