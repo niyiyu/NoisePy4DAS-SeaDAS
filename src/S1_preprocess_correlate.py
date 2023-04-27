@@ -1,5 +1,5 @@
 import sys
-sys.path.append("/tmp/DASStore")
+sys.path.append("../DASStore")
 # sys.path.append("/home/niyiyu/notebooks/DASStore")
 
 import os
@@ -57,7 +57,11 @@ sps         = 100                                                         # curr
 samp_freq   = 50                                                          # targeted sampling rate
 freqmin     = 1                                                           # pre filtering frequency bandwidth
 freqmax     = 20                                                          # note this cannot exceed Nquist freq
-flag        = False                                                       # print intermediate variables and computing time
+
+if 'JOB_VERBOSE_FLAG' in os.environ:
+    flag        = eval(os.environ['JOB_VERBOSE_FLAG'])                    # print intermediate variables and computing time
+else:
+    flag        = False
 gaug_len    = 2                                                           # gauge length of the array for inter-station distance (assuming linear array)
 
 # useful parameters for cross correlating the data
