@@ -158,7 +158,7 @@ if rank == 0:
 for i in rank_split:
     t0=time.time()
 
-    corr_full = np.zeros([1001, n_pair])
+    corr_full = np.zeros([1001, n_pair], dtype = np.float16)
     stack_full = np.zeros([1, n_pair], dtype = int)
     starthour = acq_t0 + timedelta(hours = int(i))
 
