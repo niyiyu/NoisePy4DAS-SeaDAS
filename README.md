@@ -10,7 +10,7 @@ We take the example of the SeaDAS-N DAS recording that occurred between April 20
 We host our DAS data in DASstore, a new storage solution for distributed acoustic sensing (DAS) data. We introduce object storage that has been widely used in commercial cloud storage (AWS S3, Azure Blob, etc.) to a local data server. Instead of hosting data in the HDF5 format, we proposed hosting DAS data in the Zarr format that is optimized for cloud environment. See [this repo](https://github.com/niyiyu/DASstore) for more information.
 
 ## The tool: NoisePy4DAS
-We use a modified version of [NoisePy](https://github.com/mdenolle/NoisePy) to implement the cross-correlation operation. The package is containerized into Docker image and hosted on GitHub that can is publically available from Cloud platform.
+We use a modified version of [NoisePy](https://github.com/mdenolle/NoisePy) to implement the cross-correlation operation. The package is containerized into Docker image and hosted on GitHub that can is publicly available from Cloud platform.
 
 ## AWS Batch for massive parallelization computing
 * Remember to set environment variable `JOB_ARRAY_SIZE` with the number of array size submitted to the Batch.
