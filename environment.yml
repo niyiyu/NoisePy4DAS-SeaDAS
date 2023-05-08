@@ -16,3 +16,4 @@ dependencies:
     - s3fs
     - fsspec
     - jupyter
+    - pyasdf
