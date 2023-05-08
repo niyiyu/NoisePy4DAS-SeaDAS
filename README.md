@@ -24,3 +24,15 @@ We use a modified version of [NoisePy](https://github.com/mdenolle/NoisePy) to i
 Current results include the hourly Cross-correlation Functions (CCF) of all channel pairs, for the one month data. Figure below shows a daily stacking of the correlation function using channel 500 as the virtual source.
 
 ![map](./figures/seadas-aws-ccf.png)
+
+## Tutorial
+A short tutorial is available at [notebooks/](./notebooks/example_NoisePy4DAS_SeaDAS-N.ipynb). If you have Docker, you can also pull the image from 
+```bash
+docker pull ghcr.io/niyiyu/noisepy4das-seadas:latest
+```
+
+Run the command to launch the Jupyter notebook from the Docker container.
+```bash
+docker run --rm -p 8889:8888 ghcr.io/niyiyu/noisepy4das-seadas jupyter notebook --ip 0.0.0.0
+```
+You would need to go to `localhost:8889` using **browser on your local computer**. Make sure no other process is using 8889 port, otherwise replace it in the command above.
