@@ -33,6 +33,6 @@ docker pull ghcr.io/niyiyu/noisepy4das-seadas:latest
 
 Run the command to launch the Jupyter notebook from the Docker container.
 ```bash
-docker run --rm -p 8889:8888 ghcr.io/niyiyu/noisepy4das-seadas jupyter notebook --ip 0.0.0.0
+docker run --rm -p 8880:8888 ghcr.io/niyiyu/noisepy4das-seadas jupyter notebook --ip 0.0.0.0
 ```
-You would need to go to `localhost:8889` using **browser on your local computer**. Make sure no other process is using 8889 port, otherwise replace it in the command above.
+You would need to go to `localhost:8880` using **browser on your local computer**. Make sure no other process is using 8880 port, otherwise replace the port in the command above.
