@@ -1,6 +1,6 @@
 # NoisePy/SeaDAS/DASstore cross-correlation project
 ## Ambient noise cross-correlation of DAS data on AWS cloud
-
+[![DOI](https://zenodo.org/badge/607295205.svg)](https://zenodo.org/badge/latestdoi/607295205) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![map](./figures/seadas-aws-noisepy.png)
 
 ## The data: SeaDAS-N
