@@ -1,6 +1,6 @@
-# NoisePy/SeaDAS/DASstore cross-correlation project
+# SeaDAS-Noise cross-correlation project
 ## Ambient noise cross-correlation of DAS data on AWS cloud
-[![DOI](https://zenodo.org/badge/607295205.svg)](https://zenodo.org/badge/latestdoi/607295205) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![DOI](https://zenodo.org/badge/607295205.svg)](https://zenodo.org/badge/latestdoi/607295205) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)[![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](<Redirect-URL>)
 ![map](./figures/seadas-aws-noisepy.png)
 
 ## The data: SeaDAS-N
@@ -15,12 +15,12 @@ We host our DAS data in DASstore, a new storage solution for distributed acousti
 We use a modified version of [NoisePy](https://github.com/mdenolle/NoisePy) to implement the cross-correlation operation. The package is containerized into Docker image and hosted on GitHub that can is publicly available from Cloud platform.
 
 ## AWS Batch for massive parallelization computing
-* Remember to set environment variable `JOB_ARRAY_SIZE` with the number of array size submitted to the Batch.
+* Set environment variable `JOB_ARRAY_SIZE` with the number of array size submitted to the Batch.
     ```
     ["python", "src/S1_preprocess_correlate.py"]
     ```
 
-* Set `JOB_VERBOSE_FLAG` as `True` to print more logs.
+* Export `JOB_VERBOSE_FLAG` as `True` to print more logs.
 
 ## Results
 Current results include the hourly Cross-correlation Functions (CCF) of all channel pairs, for the one month data. Figure below shows a daily stacking of the correlation function using channel 500 as the virtual source.
