@@ -119,6 +119,7 @@ else:
 # split jobs by rank
 # date_list   = comm.bcast(date_list,root=0)
 n_hour = comm.bcast(n_hour,root=0)
+acq_t0 = comm.bcast(acq_t0,root=0)
 acq_t0 = datetime.fromtimestamp(comm.bcast(acq_t0.timestamp(),root=0))
 array_split = np.array_split(np.arange(n_hour), ARRAY_SIZE)[ARRAY_INDEX] 
 rank_split = np.array_split(array_split, size)[rank]
