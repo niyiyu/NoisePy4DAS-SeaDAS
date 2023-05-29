@@ -219,6 +219,9 @@ def smooth_source_spect(fft1,cc_para):
 
 def correlate(fft1_smoothed_abs,fft2,D,Nfft):
     '''
+    A working verion that is 60% faster than previous version.
+    modified by Yiyu Ni (niyiyu@uw.edu)
+    
     this function does the cross-correlation in freq domain and has the option to keep sub-stacks of
     the cross-correlation if needed. it takes advantage of the linear relationship of ifft, so that
     stacking is performed in spectrum domain first to reduce the total number of ifft. (used in S1)
@@ -258,7 +261,7 @@ def correlate(fft1_smoothed_abs,fft2,D,Nfft):
 
     #------convert all 2D arrays into 1D to speed up--------
     corr = np.zeros(nwin*Nfft2,dtype=np.complex64)
-    fft1 = np.ones(shape=(nwin,1))*fft1_smoothed_abs.reshape(1,fft1_smoothed_abs.size)  # duplicate fft1_smoothed_abs for nwin rows
+    fft1 = np.repeat(fft1_smoothed_abs.reshape(1,fft1_smoothed_abs.size), nwin, axis = 0)  # duplicate fft1_smoothed_abs for nwin rows
     corr = fft1.reshape(fft1.size,)*fft2.reshape(fft2.size,)
 
     if method == "coherency":
@@ -267,15 +270,14 @@ def correlate(fft1_smoothed_abs,fft2,D,Nfft):
     corr  = corr.reshape(nwin,Nfft2)
 
     # loop through each cross correlation
-    s_corr = np.zeros(shape=(nwin,Nfft),dtype=np.float32)   # stacked correlation
     ampmax = np.zeros(nwin,dtype=np.float32)
-    crap   = np.zeros(Nfft,dtype=np.complex64)
-    for i in range(nwin):
-        crap[:Nfft2] = corr[i,:]
-        crap[:Nfft2] = crap[:Nfft2]-np.mean(crap[:Nfft2])   # remove the mean in freq domain (spike at t=0)
-        crap[-(Nfft2)+1:] = np.flip(np.conj(crap[1:(Nfft2)]),axis=0)
-        crap[0]=complex(0,0)
-        s_corr[i,:] = np.real(np.fft.ifftshift(scipy.fftpack.ifft(crap, Nfft, axis=0)))
+
+    crap   = np.zeros(shape=(nwin, Nfft), dtype=np.complex64)
+    crap[:, :Nfft2] = corr
+    crap[:, :Nfft2] -= np.mean(crap[:, :Nfft2], axis=-1, keepdims=True)
+    crap[:, -(Nfft2)+1:] = np.flip(np.conj(crap[:, 1:(Nfft2)]), axis=-1)
+    crap[:, 0] = complex(0,0)
+    s_corr = scipy.fftpack.ifftshift(scipy.fftpack.ifft(crap, Nfft, axis = -1), axes = -1).real
 
     # remove abnormal trace
     ampmax = np.max(s_corr,axis=1)
