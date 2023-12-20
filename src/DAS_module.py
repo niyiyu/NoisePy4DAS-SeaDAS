@@ -274,9 +274,9 @@ def correlate(fft1_smoothed_abs,fft2,D,Nfft):
 
     crap   = np.zeros(shape=(nwin, Nfft), dtype=np.complex64)
     crap[:, :Nfft2] = corr
-    crap[:, :Nfft2] -= np.mean(crap[:, :Nfft2], axis=-1, keepdims=True)
+    # crap[:, :Nfft2] -= np.mean(crap[:, :Nfft2], axis=-1, keepdims=True)
     crap[:, -(Nfft2)+1:] = np.flip(np.conj(crap[:, 1:(Nfft2)]), axis=-1)
-    crap[:, 0] = complex(0,0)
+    # crap[:, 0] = complex(0,0)
     s_corr = scipy.fftpack.ifftshift(scipy.fftpack.ifft(crap, Nfft, axis = -1), axes = -1).real
 
     # remove abnormal trace
