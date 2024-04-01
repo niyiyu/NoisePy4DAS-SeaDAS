@@ -367,7 +367,7 @@ def taper(data):
         npts = data.shape[0]
         # window length
         if npts*0.05>20:wlen = 20
-        else:wlen = npts*0.05
+        else:wlen = int(npts*0.05)
         # taper values
         func = _get_function_from_entry_point('taper', 'hann')
         if 2*wlen == npts:
@@ -381,7 +381,7 @@ def taper(data):
         npts = data.shape[1]
         # window length
         if npts*0.05>20:wlen = 20
-        else:wlen = npts*0.05
+        else:wlen = int(npts*0.05)
         # taper values
         func = _get_function_from_entry_point('taper', 'hann')
         if 2*wlen == npts:
